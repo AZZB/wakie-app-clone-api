@@ -87,6 +87,17 @@ describe('Web:Auth', () => {
                               .expect(204)
   })
 
+  it('POST /api-v1/topics/:id/like', async () => {
+    const topic_id = (await FeedUtils.topic_fixture())._id
+    const { body } = await  send_request(request, 'post', `${prefix}/${topic_id}/like`, {}, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data.success).to.be.true
+  })
+
   it('GET /api-v1/topics/:id/comments | return list of comments', async () => {
     const user_id = (await user_fixture())._id
     const topic_id = (await topic_fixture('', user_id))._id
@@ -115,6 +126,25 @@ describe('Web:Auth', () => {
     const comment = data['comment']
     expect(comment.user_creator.id).to.equal(logged_user.id)
   })
+
+  it('DEL /api-v1/topics/comments/:id | delete comment', async () => {
+    const topic_id = (await FeedUtils.topic_fixture('', logged_user.id))._id
+    const id = (await comment_fixture('', logged_user.id, topic_id))._id
+    const { body } = await  send_request(request, 'del', `${prefix}/comments/${id}`, token)
+                              .expect(204)
+  })
+
+  it('POST /api-v1/topics/comments/:id/like', async () => {
+    const id = (await comment_fixture())._id
+    const { body } = await  send_request(request, 'post', `${prefix}/comments/${id}/like`, {}, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data.success).to.be.true
+  })
+
 
 
 })

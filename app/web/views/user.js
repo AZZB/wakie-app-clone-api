@@ -55,7 +55,7 @@ function render_faved(ctx, data, status) {
   #fullname ->
   #photo ->
   #added_at ->
-  #you_fave -> boolean | define if you're faving this profile
+  #you_fave -> boolean | define if you're faving this profile 
 */
 function faves({ _doc: {created_at, from: { _id, profile }}}) {
   return {

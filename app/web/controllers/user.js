@@ -1,4 +1,5 @@
 import Lib from '../../lib'
+import Storage from '../../lib/storage'
 import Accounts from '../../contexts/accounts'
 import Feeds from '../../contexts/feeds'
 import UserView from '../views/user'
@@ -88,6 +89,33 @@ async function remove_fave(ctx, next) {
 }
 
 
+async function upload_photo(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  try {
+    const user = await Accounts.get_user(logged_user_id)
+    await Storage.upload(ctx, next)
+    user.profile.photo = ctx.req.file.filename
+    await user.save()
+    UserView.render_dumb(ctx, { success: true })
+  } catch (e) {
+    LOG('UserController-upload_photo', e)
+    Lib.error_handler(ctx, e, next)
+  }
+}
+
+async function display_photo(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  try {
+    const user = await Accounts.get_user(logged_user_id)
+    const { type, stream } = await Storage.stream_image(ctx.context.upload_folder_path, user.profile.photo)
+    ctx.type = type
+    ctx.body = stream
+  } catch (e) {
+    LOG('UserController-display_photo', e)
+    Lib.error_handler(ctx, e, next)
+  }
+}
+
 export default {
   show,
   update,
@@ -96,4 +124,6 @@ export default {
   faved,
   add_fave,
   remove_fave,
+  upload_photo,
+  display_photo,
 }

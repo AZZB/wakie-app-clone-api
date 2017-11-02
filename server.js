@@ -3,13 +3,18 @@ import koaLogger from 'koa-logger'
 import koaBody from 'koa-body'
 import connectToDB from './app/db/connect'
 import router from './app/web/routes'
+import Middlewares from './app/lib/middlewares'
+import CustomError from './app/lib/CustomError'
 
 const koa = new Koa()
+
+global.CustomError = CustomError
 
 const mode = is_dev()? "dev" : "prod";
 connectToDB(mode)
 
 if(is_dev()) koa.use(koaLogger());
+koa.use(Middlewares.upload_path(__dirname))
 koa.use(koaBody())
 koa.use(router.routes())
 //koa.use(router.allowedMethods())

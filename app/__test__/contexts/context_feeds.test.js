@@ -70,6 +70,14 @@ describe('Context:Accounts', () => {
     throw new Error('test failed : create_topic with invalid data')
   })
 
+  it('like_topic', async () => {
+    const user_id = (await user_fixture())._id
+    const topic = await topic_fixture('', user_id)
+
+    const result = await Feeds.like_topic(topic._id, user_id)
+    expect(result.success).to.be.true
+  })
+
   it('get_comments: return list of comments', async () => {
     const user_id = (await user_fixture())._id
     const topic_id = (await topic_fixture('', user_id))._id
@@ -97,15 +105,26 @@ describe('Context:Accounts', () => {
   })
 
   it('remove_comment ', async () => {
-    const comment = await comment_fixture()
-    await Feeds.remove_comment(comment)
+    const user_id = (await user_fixture())._id
+    const topic_id = (await topic_fixture('', user_id))._id
+    const id = (await comment_fixture('', user_id, topic_id))._id
+
+    await Feeds.remove_comment(id, user_id)
 
     try {
-      await Feeds.get_comment(comment._id, 'user_id_here')
+      await Feeds.get_comment(id, user_id)
     } catch (e) {
       return;
     }
     throw new Error('test failed : create_comment with invalid data')
+  })
+
+  it('like_comment', async () => {
+    const user_id = (await user_fixture())._id
+    const id = (await comment_fixture('', user_id))._id
+
+    const result = await Feeds.like_comment(id, user_id)
+    expect(result.success).to.be.true
   })
 
 })

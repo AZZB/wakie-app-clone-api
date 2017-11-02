@@ -6,6 +6,8 @@ const router = new Router({
 })
 
 
+router.post('/photo', Controller.upload_photo)
+router.get('/photo', Controller.display_photo)
 
 router.get('/:id', Controller.show)
 router.put('/', Controller.update)

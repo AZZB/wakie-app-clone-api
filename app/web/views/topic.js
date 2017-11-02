@@ -82,10 +82,20 @@ function comment(comment) {
   };
 }
 
+
+function render_dumb(ctx, result) {
+  ctx.body = {
+    data: result,
+  }
+}
+
+
 export default {
   render,
   topic,
 
   render_comment,
   comment,
+
+  render_dumb,
 }

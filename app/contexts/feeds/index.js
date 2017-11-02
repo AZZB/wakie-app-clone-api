@@ -45,6 +45,19 @@ async function remove_topic(id, user_id) {
   await Topic.update(topic, {deleted_at: Date.now()})
 }
 
+async function like_topic(id, logged_user_id) {
+  const topic = await Topic.findById(id)
+  const isLiked = !!topic.liked_by.find(u => logged_user_id === u)
+  if(isLiked)
+    topic.liked_by.remove(logged_user_id)
+  else
+    topic.liked_by.push(logged_user_id)
+
+  await topic.save()
+
+  return { success: true }
+}
+
 async function get_comments(topic_id, logged_user_id) {
   const comments = (await Topic.findById(topic_id, 'comments').populate({path: 'comments', populate: {path: 'user_creator', select: 'profile'}})).comments
 
@@ -73,10 +86,24 @@ async function create_comment(attrs) {
   return await get_comment(comment._id, user_id)
 }
 
-async function remove_comment(comment) {
+async function remove_comment(id, logged_user_id) {
+  const comment = await Comment.findOne({ _id: id, user_creator: logged_user_id })
+  if(!comment) return;
   await Comment.update(comment, {deleted_at: Date.now()})
 }
 
+async function like_comment(id, logged_user_id) {
+  const comment = await Comment.findById(id)
+  const isLiked = !!comment.liked_by.find(u => logged_user_id === u)
+  if(isLiked)
+    comment.liked_by.remove(logged_user_id)
+  else
+    comment.liked_by.push(logged_user_id)
+
+  await comment.save()
+
+  return { success: true }
+}
 
 async function clean() {
   await Comment.remove({})
@@ -91,11 +118,13 @@ export default {
   get_user_topics,
   create_topic,
   remove_topic,
+  like_topic,
 
   get_comments,
   get_comment,
   create_comment,
   remove_comment,
+  like_comment,
 
   clean,
 }

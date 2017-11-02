@@ -49,6 +49,18 @@ async function remove(ctx, next) {
   }
 }
 
+async function like_topic(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  const id = ctx.params.id
+  try {
+    const result = await Feeds.like_topic(id, logged_user_id)
+    TopicView.render_dumb(ctx, result)
+  } catch (e) {
+    LOG('TopicController:like_topic exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
+}
+
 async function comment_index(ctx, next) {
   const logged_user_id = ctx.state.user.id
   const topic_id = ctx.params.id
@@ -75,7 +87,27 @@ async function comment_create(ctx, next) {
 }
 
 async function comment_remove(ctx, next) {
-  ctx.body = 'comment_remove'
+  const logged_user_id = ctx.state.user.id
+  const id = ctx.params.id
+  try {
+    await Feeds.remove_comment(id, logged_user_id)
+    ctx.status = 204
+  } catch (e) {
+    LOG('TopicController:comment_remove exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
+}
+
+async function like_comment(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  const id = ctx.params.id
+  try {
+    const result = await Feeds.like_comment(id, logged_user_id)
+    TopicView.render_dumb(ctx, result)
+  } catch (e) {
+    LOG('TopicController:like_comment exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
 }
 
 
@@ -84,8 +116,10 @@ export default {
   show,
   create,
   remove,
+  like_topic,
 
   comment_index,
   comment_create,
-  comment_remove
+  comment_remove,
+  like_comment,
 }

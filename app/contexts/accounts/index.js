@@ -6,10 +6,10 @@ import { get_user_topics } from '../feeds'
 const check_attrs = Lib.Tools.check_attrs
 
 
-async function get_user(id, current_user_id) {
+async function get_user(id, logged_user_id) {
   const user = await User.findById(id, '-credential')
   if(!user || user.deleted_at) throw new CustomError('UserError', 'User not found')
-  return await shape_user_info(user, current_user_id)
+  return await shape_user_info(user, logged_user_id)
 }
 
 async function create_user(attrs) {
@@ -32,12 +32,12 @@ async function update_user(user_id, attrs) {
 
 
 async function get_user_faves(user_id) {
-  const faves = await Fave.find({to: user_id}).populate('from', 'profile')
+  const faves = await Fave.find({to: user_id, confirmed: true}).populate('from', 'profile')
   return faves
 }
 
 async function get_user_faved(user_id) {
-  const faved = await Fave.find({from: user_id}).populate('to', 'profile')
+  const faved = await Fave.find({from: user_id, confirmed: true}).populate('to', 'profile')
   return faved
 }
 
@@ -71,10 +71,10 @@ async function clean() {
 
 
 // ------------------- helpers -----------------
-async function shape_user_info(user, current_user_id) {
+async function shape_user_info(user, logged_user_id) {
   const faves_count = await Fave.where({to: user._id}).count()
   const faved_count = await Fave.where({from: user._id}).count()
-  const you_fave = !current_user_id? false : (await Fave.findOne({from: current_user_id, to: user._id})) !== null
+  const you_fave = !logged_user_id? false : (await Fave.findOne({from: logged_user_id, to: user._id})) !== null
 
   user.other_fields = {
     faves_count,
