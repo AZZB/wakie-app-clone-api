@@ -26,7 +26,11 @@ describe('Context:Accounts', () => {
 
 
   it('get_topics | return list of topics', async () => {
+    const user_id = (await user_fixture())._id
+    const { _id } = await topic_fixture('', user_id)
 
+    const topics = await Feeds.get_topics(user_id)
+    expect(topics.length).to.equal(1)
   })
 
   it('get_topic | return topic', async () => {
@@ -67,7 +71,12 @@ describe('Context:Accounts', () => {
   })
 
   it('get_comments: return list of comments', async () => {
+    const user_id = (await user_fixture())._id
+    const topic_id = (await topic_fixture('', user_id))._id
+    const id = (await comment_fixture('', user_id, topic_id))._id
 
+    const comments = await Feeds.get_comments(topic_id, user_id)
+    expect(comments.length).to.equal(1)
   })
 
   it('get_comment: return comment', async () => {

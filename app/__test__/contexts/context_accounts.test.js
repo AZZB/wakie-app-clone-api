@@ -49,9 +49,45 @@ describe('Context:Accounts', () => {
   it('update_user when the data is valid', async () => {
     const user_id = (await AccountUtils.user_fixture())._id
     const user = await Accounts.update_user(user_id, update_user_data)
-    
+
     expect(`${user_id}`).to.equal(`${user._id}`)
     expect(user.profile.fullname).to.equal('updated_some_fullname')
   })
 
+  it('get_user_faves', async () => {
+    const { user_id, other_user_id } = await create_two_user()
+    const result = await Accounts.add_fave(user_id, other_user_id)
+
+    const faves = await Accounts.get_user_faves(other_user_id)
+    // console.log(faves);
+  })
+
+  it('get_user_faved', async () => {
+    const { user_id, other_user_id } = await create_two_user()
+    const result = await Accounts.add_fave(user_id, other_user_id)
+
+    const faved = await Accounts.get_user_faved(user_id)
+    // console.log(faved);
+  })
+
+  it('add_fave && remove_fave', async () => {
+    const { user_id, other_user_id } = await create_two_user()
+
+    const result = await Accounts.add_fave(user_id, other_user_id)
+
+    expect(result.success).to.equal(true)
+
+    await Accounts.remove_fave(user_id, other_user_id)
+  })
+
+
 })
+
+
+async function create_two_user() {
+  const user_id = (await AccountUtils.user_fixture())._id
+  const attrs = {email: 'other@email.com', fullname: 'other_fullname'}
+  const other_user_id = (await AccountUtils.user_fixture('', attrs))._id
+
+  return {user_id, other_user_id}
+}

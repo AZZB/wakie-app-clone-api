@@ -34,7 +34,18 @@ describe('Web:Auth', () => {
   })
 
 
-  it('GET /api-v1/topics | return list of topics', async () => {})
+  it('GET /api-v1/topics | return list of topics', async () => {
+    const topic_id = (await FeedUtils.topic_fixture())._id
+    const { body } = await  send_request(request, 'get', `${prefix}`, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data['topics']).to.not.undefined
+    const topics = data['topics']
+    expect(topics.length).to.equal(1)
+  })
 
   it('GET /api-v1/topics/:id | return topic', async () => {
     const topic_id = (await FeedUtils.topic_fixture())._id
@@ -76,7 +87,21 @@ describe('Web:Auth', () => {
                               .expect(204)
   })
 
-  it('GET /api-v1/topics/:id/comments | return list of comments', async () => {})
+  it('GET /api-v1/topics/:id/comments | return list of comments', async () => {
+    const user_id = (await user_fixture())._id
+    const topic_id = (await topic_fixture('', user_id))._id
+    await comment_fixture('', user_id, topic_id)
+
+    const { body } = await  send_request(request, 'get', `${prefix}/${topic_id}/comments`, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data['comments']).to.not.undefined
+    const comments = data['comments']
+    expect(comments.length).to.equal(1)
+  })
 
   it('POST /api-v1/users/:id/comments | create comment and return it', async () => {
     const topic_id = (await FeedUtils.topic_fixture())._id

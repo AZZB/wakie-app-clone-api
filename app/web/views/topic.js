@@ -28,15 +28,15 @@ function render(ctx, data, status) {
   }
 */
 function topic(topic) {
-  const { _id, content, created_at, tags, user_creator, other_fields: { current_user_id }} = topic
+  const { _id, content, created_at, tags, user_creator, other_fields: { logged_user_id }} = topic
 
   return {
     id: _id,
     content, created_at, tags,
     likes_count: topic.liked_by.length,
     comments_count: topic.comments.length,
-    you_liked: !!topic.liked_by.find(uid => uid === current_user_id),
-    you_commented: !!topic.comments.find(uid => uid === current_user_id),
+    you_liked: !!topic.liked_by.find(uid => uid === logged_user_id),
+    you_commented: !!topic.comments.find(uid => uid === logged_user_id),
     user_creator: {
       id: user_creator._id,
       fullname: user_creator.profile.fullname,
@@ -67,13 +67,13 @@ function render_comment(ctx, data, status) {
   }
 */
 function comment(comment) {
-  const { _id, content, created_at, replied_to, user_creator, other_fields: { current_user_id }} = comment
+  const { _id, content, created_at, replied_to, user_creator, other_fields: { logged_user_id }} = comment
 
   return {
     id: _id,
     content, created_at, replied_to,
     likes_count: comment.liked_by.length,
-    you_liked: !!comment.liked_by.find(uid => uid === current_user_id),
+    you_liked: !!comment.liked_by.find(uid => uid === logged_user_id),
     user_creator: {
       id: user_creator._id,
       fullname: user_creator.profile.fullname,

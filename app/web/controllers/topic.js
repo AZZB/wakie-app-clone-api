@@ -4,7 +4,14 @@ import TopicView from '../views/topic'
 
 
 async function index(ctx, next) {
-  ctx.body = 'index'
+  const logged_user_id = ctx.state.user.id
+  try {
+    const topics = await Feeds.get_topics(logged_user_id)
+    TopicView.render(ctx, topics)
+  } catch (e) {
+    LOG('TopicController:index exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
 }
 
 async function show(ctx, next) {
@@ -40,17 +47,18 @@ async function remove(ctx, next) {
     LOG('TopicController:remove exception', e)
     await Lib.error_handler(ctx, e, next)
   }
-  ctx.body = 'remove'
 }
 
 async function comment_index(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  const topic_id = ctx.params.id
   try {
-
+    const comments = await Feeds.get_comments(topic_id, logged_user_id)
+    TopicView.render_comment(ctx, comments)
   } catch (e) {
     LOG('TopicController:comment_index exception', e)
     await Lib.error_handler(ctx, e, next)
   }
-  ctx.body = 'comment_index'
 }
 
 async function comment_create(ctx, next) {

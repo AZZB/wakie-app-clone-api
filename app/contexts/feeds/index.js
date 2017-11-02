@@ -9,20 +9,25 @@ const check_attrs = Lib.Tools.check_attrs
 /**
   this function gonna return list of topics based on user activity ( faves, tags and so on )
 */
-async function get_topics() {
+async function get_topics(logged_user_id) {
+  const topics = await Topic.find({}).populate('user_creator', 'profile')
 
+  return topics.map(topic => {
+                  topic.other_fields = { logged_user_id }
+                  return topic
+                })
 }
 
-async function get_topic(id, current_user_id) {
+async function get_topic(id, logged_user_id) {
   const topic = await Topic.findById(id).populate('user_creator', 'profile')
   if(!topic || topic.deleted_at) throw new CustomError('TopicError', 'Topic not found')
 
-  topic.other_fields = { current_user_id }
+  topic.other_fields = { logged_user_id }
 
   return topic
 }
 
-export async function get_user_topics(user_id) {
+async function get_user_topics(user_id) {
   const topics = await Topic.find({user_creator: user_id}).populate('user_creator', 'profile')
   return topics
 }
@@ -40,15 +45,20 @@ async function remove_topic(id, user_id) {
   await Topic.update(topic, {deleted_at: Date.now()})
 }
 
-async function get_comments() {
+async function get_comments(topic_id, logged_user_id) {
+  const comments = (await Topic.findById(topic_id, 'comments').populate({path: 'comments', populate: {path: 'user_creator', select: 'profile'}})).comments
 
+  return comments.map(comment => {
+                  comment.other_fields = { logged_user_id }
+                  return comment
+                })
 }
 
-async function get_comment(id, current_user_id) {
+async function get_comment(id, logged_user_id) {
   const comment = await Comment.findById(id).populate('user_creator', 'profile')
   if(!comment || comment.deleted_at) throw new CustomError('CommentError', 'Comment not found')
 
-  comment.other_fields = { current_user_id }
+  comment.other_fields = { logged_user_id }
 
   return comment
 }
@@ -78,6 +88,7 @@ async function clean() {
 export default {
   get_topics,
   get_topic,
+  get_user_topics,
   create_topic,
   remove_topic,
 

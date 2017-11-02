@@ -1,6 +1,8 @@
 import Lib from '../../lib'
 import Accounts from '../../contexts/accounts'
+import Feeds from '../../contexts/feeds'
 import UserView from '../views/user'
+import TopicView from '../views/topic'
 
 
 
@@ -31,8 +33,8 @@ async function update(ctx, next) {
 async function topics(ctx, next) {
   const id = ctx.params.id
   try {
-    const topics = await Accounts.get_user_topics(id)
-    UserView.render_topic(ctx, topics)
+    const topics = await Feeds.get_user_topics(id)
+    TopicView.render(ctx, topics)
   } catch (e) {
     LOG('UserController:topics exception', e)
     await Lib.error_handler(ctx, e, next)
@@ -43,7 +45,7 @@ async function faves(ctx, next) {
   const id = ctx.params.id
   try {
     const faves = await Accounts.get_user_faves(id)
-    UserView.render_fave(faves)
+    UserView.render_faves(ctx, faves)
   } catch (e) {
     LOG('UserController:faves exception', e)
     await Lib.error_handler(ctx, e, next)
@@ -54,9 +56,33 @@ async function faved(ctx, next) {
   const id = ctx.params.id
   try {
     const faved = await Accounts.get_user_faved(id)
-    UserView.render_fave(faved)
+    UserView.render_faved(ctx, faved)
   } catch (e) {
     LOG('UserController:faved exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
+}
+
+async function add_fave(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  const { to_fave } = ctx.request.body
+  try {
+    const result = await Accounts.add_fave(logged_user_id, to_fave)
+    UserView.render_dumb(ctx, result)
+  } catch (e) {
+    LOG('UserController:add_fave exception', e)
+    await Lib.error_handler(ctx, e, next)
+  }
+}
+
+async function remove_fave(ctx, next) {
+  const logged_user_id = ctx.state.user.id
+  const to_remove = ctx.params.to_remove
+  try {
+    await Accounts.remove_fave(logged_user_id, to_remove)
+    ctx.status = 204
+  } catch (e) {
+    LOG('UserController:remove_fave exception', e)
     await Lib.error_handler(ctx, e, next)
   }
 }
@@ -68,4 +94,6 @@ export default {
   topics,
   faves,
   faved,
+  add_fave,
+  remove_fave,
 }

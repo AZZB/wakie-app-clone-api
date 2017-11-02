@@ -41,7 +41,58 @@ function user({ _doc: {_id, confirmed, created_at, profile}, other_fields}) {
 }
 
 
+function render_faves(ctx, data, status) {
+  Lib.Tools.abstract_render(ctx, data, status)(faves, 'fave', 'faves')
+}
+
+function render_faved(ctx, data, status) {
+  Lib.Tools.abstract_render(ctx, data, status)(faves, 'fave', 'faved')
+}
+
+/**
+  this function gonna return fave in this shape :
+  #id -> user_id that you're faving
+  #fullname ->
+  #photo ->
+  #added_at ->
+  #you_fave -> boolean | define if you're faving this profile
+*/
+function faves({ _doc: {created_at, from: { _id, profile }}}) {
+  return {
+    id: _id,
+    fullname: profile.fullname,
+    photo: profile.photo,
+    added_at: created_at,
+  }
+}
+
+function faved({ _doc: {created_at, to: { _id, profile }}}) {
+  return {
+    id: _id,
+    fullname: profile.fullname,
+    photo: profile.photo,
+    added_at: created_at,
+  }
+}
+
+
+
+function render_dumb(ctx, result) {
+  ctx.body = {
+    data: result,
+  }
+}
+
+
 export default {
   render,
   user,
+
+  render_faves,
+  faves,
+
+  render_faved,
+  faved,
+
+  render_dumb,
 }

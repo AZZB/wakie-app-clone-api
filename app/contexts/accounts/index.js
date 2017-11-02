@@ -41,6 +41,19 @@ async function get_user_faved(user_id) {
   return faved
 }
 
+async function add_fave(from, to) {
+  let fave = await Fave.findOne({from, to})
+  if(!fave) fave = await Fave.create({from, to})
+
+  return {
+    success: true,
+  }
+}
+
+async function remove_fave(from, to_remove) {
+  await Fave.remove({from, to: to_remove})
+}
+
 async function authenticate_by_login_password(login, password) {
   const user = await User.findOne({'credential.email': login})
   if(!user) throw new CustomError("AuthError", "Authentication failed", {login: "this login does not exist"}, 401)
@@ -77,9 +90,10 @@ export default {
   create_user,
   update_user,
 
-  get_user_topics,
   get_user_faves,
   get_user_faved,
+  add_fave,
+  remove_fave,
 
   authenticate_by_login_password,
 

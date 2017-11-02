@@ -35,8 +35,8 @@ export const AccountUtils = {
   update_user_data: assign('user', update_user_data),
   invalid_user_data: assign('user', invalid_user_data),
 
-  user_fixture: async (flag) => {
-    const user = await Accounts.create_user(AccountUtils.create_user_data())
+  user_fixture: async (flag, data) => {
+    const user = await Accounts.create_user(AccountUtils.create_user_data(data))
     return get(user, flag)
   },
 

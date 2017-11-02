@@ -55,7 +55,7 @@ describe('Web:Auth', () => {
     expect(user.fullname).to.equal('updated_some_fullname')
   })
 
-  it('GET /api-v1/users/:id/topics | return user', async () => {
+  it('GET /api-v1/users/:id/topics | return topics', async () => {
     const user_id = (await user_fixture())._id
 
     const { body } = await  send_request(request, 'get', `${prefix}/${user_id}/topics`, token)
@@ -69,9 +69,34 @@ describe('Web:Auth', () => {
 
   })
 
-  it('GET /api-v1/users/:id/faves | return user', async () => {})
+  it('GET /api-v1/users/:id/faves | return users', async () => {
+    const user_id = (await user_fixture())._id
 
-  it('GET /api-v1/users/:id/faved | return user', async () => {})
+    const { body } = await  send_request(request, 'get', `${prefix}/${user_id}/faves`, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data['faves']).to.not.undefined
+    const faves = data['faves']
+    //console.log(faves);
+
+  })
+
+  it('GET /api-v1/users/:id/faved | return user', async () => {
+    const user_id = (await user_fixture())._id
+
+    const { body } = await  send_request(request, 'get', `${prefix}/${user_id}/faved`, token)
+                              .expect('Content-Type', /json/)
+                              .expect(200)
+
+    expect(body['data']).to.not.undefined
+    const data = body['data']
+    expect(data['faved']).to.not.undefined
+    const faves = data['faved']
+    //console.log(faves);
+  })
 
 
 })
