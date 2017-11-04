@@ -6,9 +6,7 @@ import Lib from '../../lib'
 const check_attrs = Lib.Tools.check_attrs
 
 
-/**
-  this function gonna return list of topics based on user activity ( faves, tags and so on )
-*/
+
 async function get_topics(logged_user_id) {
   const topics = await Topic.find({}).populate('user_creator', 'profile')
 

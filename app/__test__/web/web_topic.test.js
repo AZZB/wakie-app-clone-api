@@ -5,7 +5,7 @@ import { send_request, login_process } from './__helpers__'
 import { AccountUtils, FeedUtils } from '../__share__'
 
 
-const prefix = '/api-v1/topics'
+const prefix = '/api_v1/topics'
 
 
 const create_topic_data = FeedUtils.create_topic_data()

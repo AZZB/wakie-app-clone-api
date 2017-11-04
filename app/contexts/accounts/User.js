@@ -23,7 +23,7 @@ const UserSchema = new Schema({
 
     password: {
       type: String,
-      required: [true, 'password is required'],
+      // required: [true, 'password is required'],
     },
 
     facebook_id: { type: String },

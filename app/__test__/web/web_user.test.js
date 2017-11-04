@@ -4,7 +4,7 @@ import server from './__test_server__'
 import { send_request, login_process } from './__helpers__'
 import { AccountUtils } from '../__share__'
 
-const prefix = '/api-v1/users'
+const prefix = '/api_v1/users'
 
 const create_user_data = AccountUtils.create_user_data()
 const update_user_data = AccountUtils.update_user_data()

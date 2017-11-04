@@ -1,13 +1,13 @@
 import User, { cast as user_cast } from './User'
 import Fave from './Fave'
 import Lib from '../../lib'
-import { get_user_topics } from '../feeds'
+
 
 const check_attrs = Lib.Tools.check_attrs
 
 
 async function get_user(id, logged_user_id) {
-  const user = await User.findById(id, '-credential')
+  const user = await User.findById(id)
   if(!user || user.deleted_at) throw new CustomError('UserError', 'User not found')
   return await shape_user_info(user, logged_user_id)
 }
@@ -15,7 +15,17 @@ async function get_user(id, logged_user_id) {
 async function create_user(attrs) {
   check_attrs(attrs, 'user')
   const {user: { email, password, fullname }} = attrs
+  if(!password || password.length < 3) throw new CustomError('UserError', 'Invalid data', {password: 'password is required with 3 min length'}, 400)
   const user = await User.create({ credential: {email, password}, profile: {fullname} })
+  return await get_user(user._id)
+}
+
+async function create_user_by_facebook({id, displayName, photos}, upload_folder_path) {
+  let user = await User.findOne({'credential.facebook_id': id})
+  if(user) return await get_user(user._id)
+
+  const photo = await Lib.Storage.download_image(photos[0].value, `${upload_folder_path}/${displayName}-${Date.now()}.jpg`)
+  user = await User.create({credential: { facebook_id: id }, profile: {fullname: displayName, photo }, confirmed: true})
   return await get_user(user._id)
 }
 
@@ -63,6 +73,12 @@ async function authenticate_by_login_password(login, password) {
   return await get_user(user._id)
 }
 
+async function confirm_user(user_id) {
+  let user = await User.findById(user_id)
+  if(!user) return null;
+  user = await User.update(user, {'confirmed': true})
+  return user
+}
 
 async function clean() {
   await Fave.remove({})
@@ -88,6 +104,7 @@ async function shape_user_info(user, logged_user_id) {
 export default {
   get_user,
   create_user,
+  create_user_by_facebook,
   update_user,
 
   get_user_faves,
@@ -96,6 +113,7 @@ export default {
   remove_fave,
 
   authenticate_by_login_password,
+  confirm_user,
 
   clean,
 }

@@ -53,7 +53,7 @@ describe('Web:Auth', () => {
 
     expect(body['reason']).to.not.undefined
     expect(body['errors']).to.not.undefined
-    expect(body['errors']['email']).to.equal('email has an invalid format')
+    //expect(body['errors']['email']).to.equal('email has an invalid format')
   })
 
   it('POST /auth/login with valid data - return user', async () => {
@@ -61,7 +61,7 @@ describe('Web:Auth', () => {
     const { body } = await send_request(request, 'post', `${prefix}/login`, {login: 'some@email.com', password: 'some_password'})
                             .expect('Content-Type', /json/)
                             .expect(200)
-    
+
     expect(body['data']).to.not.undefined
     const data = body['data']
     expect(data['user']).to.not.undefined

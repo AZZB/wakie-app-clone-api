@@ -20,7 +20,16 @@ function auth_user({ _doc: {_id}}) {
   return { id: _id }
 }
 
+
+function render_email_verification_success(ctx, user) {
+  if(!user) { ctx.status = 404; ctx.body = 'Not found'; return;}
+  // TODO: we should render a template here
+  ctx.body = {success: true}
+}
+
 export default {
   render,
   auth_user,
+
+  render_email_verification_success,
 }

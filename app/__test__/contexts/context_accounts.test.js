@@ -31,9 +31,8 @@ describe('Context:Accounts', () => {
   it('create_user when the data is valid', async () => {
     const {_doc: user} = await Accounts.create_user(create_user_data)
     expect(user._id).to.not.undefined
-    // INFO: here it will not return credential fields
-    // expect(user.credential.email).to.equal('some@email.com')
-    // expect(user.credential.password).to.not.equal('some_password')
+    expect(user.credential.email).to.equal('some@email.com')
+    expect(user.credential.password).to.not.equal('some_password')
     expect(user.profile.fullname).to.equal('some_fullname')
   })
 

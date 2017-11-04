@@ -5,7 +5,7 @@ import topicRouter from './topic'
 import { SECRET_JWT } from '../../configs'
 
 const router = new Router({
-  prefix: '/api',
+  prefix: '/api_v1',
 })
 
 router.get('/', async (ctx, next) => {
